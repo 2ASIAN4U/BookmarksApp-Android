@@ -169,6 +169,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        nameList = data.getStringArrayListExtra(NAMELIST);
+        urlList = data.getStringArrayListExtra(URLLIST);
+        detailList = data.getStringArrayListExtra(DETAILLIST);
+        currentSelection = data.getIntExtra(CURRENT_SEL, -1);
         this.recreate();
     }
 }

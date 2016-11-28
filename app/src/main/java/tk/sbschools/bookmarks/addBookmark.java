@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,11 +26,13 @@ import android.widget.Toast;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
 
 public class addBookmark extends AppCompatActivity {
     ArrayList<String> nameList,urlList,detailList;
     ListView display;
-    TextView URLDisp,detailsDisp;
+    EditText NameDisp,URLDisp,detailsDisp;
+    Button saveList, delList, doneList;
     static final String CURRENT_SEL = "cselect";
     static final String NAMELIST = "nList";
     static final String URLLIST = "uList";
@@ -38,41 +42,69 @@ public class addBookmark extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_add_bookmark);
 
-        nameList = new ArrayList<>();
-        urlList = new ArrayList<>();
-        detailList = new ArrayList<>();
+        nameList = getIntent().getStringArrayListExtra(NAMELIST);
+        urlList = getIntent().getStringArrayListExtra(URLLIST);
+        detailList = getIntent().getStringArrayListExtra(DETAILLIST);
         display = (ListView)findViewById(R.id.listView_display);
-        URLDisp = (TextView)findViewById(R.id.textView_URL);
-        detailsDisp = (TextView)findViewById(R.id.textView_details);
+        NameDisp = (EditText)findViewById(R.id.editText_name);
+        URLDisp = (EditText) findViewById(R.id.editText_URL);
+        detailsDisp = (EditText) findViewById(R.id.editText_Desc);
+        saveList = (Button)findViewById(R.id.button_edit);
+        delList = (Button)findViewById(R.id.button_del);
+        doneList = (Button)findViewById(R.id.button_Done);
 
-        if(savedInstanceState != null){
-            currentSelection=savedInstanceState.getInt(CURRENT_SEL);
-            nameList = savedInstanceState.getStringArrayList(NAMELIST);
-            urlList = savedInstanceState.getStringArrayList(URLLIST);
-            detailList = savedInstanceState.getStringArrayList(DETAILLIST);
-            System.err.println(currentSelection);
-            if(currentSelection != -1){
-                URLDisp.setText(urlList.get(currentSelection));
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    detailsDisp.setText(detailList.get(currentSelection));
-                }
-            }
-        }
-
-        CustomAdapter myAdapter = new CustomAdapter(this,R.layout.editList_layout,nameList,urlList);
+        final CustomAdapter myAdapter = new CustomAdapter(this,R.layout.editlist_layout,nameList,urlList);
 
         display.setAdapter(myAdapter);
 
         display.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NameDisp.setText(nameList.get(position));
                 URLDisp.setText(urlList.get(position));
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-                    detailsDisp.setText(detailList.get(position));
-                }
+                detailsDisp.setText(detailList.get(position));
                 currentSelection = position;
+            }
+        });
+
+        saveList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(currentSelection != -1){
+                    nameList.set(currentSelection,NameDisp.getText().toString());
+                    urlList.set(currentSelection,URLDisp.getText().toString());
+                    detailList.set(currentSelection,detailsDisp.getText().toString());
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+        delList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentSelection != -1){
+                    nameList.remove(currentSelection);
+                    urlList.remove(currentSelection);
+                    detailList.remove(currentSelection);
+                    NameDisp.setText("Namme: ");
+                    URLDisp.setText("URL: ");
+                    detailsDisp.setText("Details: ");
+                    currentSelection = -1;
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+        doneList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.putExtra(NAMELIST, nameList);
+                intent.putExtra(URLLIST,urlList);
+                intent.putExtra(DETAILLIST,detailList);
+                intent.putExtra(CURRENT_SEL,currentSelection);
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -92,7 +124,7 @@ public class addBookmark extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater)mainContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            View layoutView = inflater.inflate(R.layout.editList_layout,null);
+            View layoutView = inflater.inflate(R.layout.editlist_layout,null);
             TextView textView = (TextView)layoutView.findViewById(R.id.textView);
             TextView urlText = (TextView)layoutView.findViewById(R.id.textView_URL);
 
@@ -103,10 +135,3 @@ public class addBookmark extends AppCompatActivity {
         }
     }
 }
-
-/*
-Intent intent = new Intent();
-intent.putExtra("edittextvalue","value_here");
-setResult(RESULT_OK, intent);
-finish();
- */
