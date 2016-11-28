@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -27,12 +28,14 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<String> nameList,urlList,detailList;
+    ArrayList<Bitmap> imagecache;
     ListView display;
     TextView URLDisp,detailsDisp;
     static final String CURRENT_SEL = "cselect";
     static final String NAMELIST = "nList";
     static final String URLLIST = "uList";
     static final String DETAILLIST = "dList";
+    static final String IMAGELIST = "iList";
     int currentSelection = -1;
 
     @Override
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         nameList = new ArrayList<>();
         urlList = new ArrayList<>();
         detailList = new ArrayList<>();
+        imagecache = new ArrayList<>();
         display = (ListView)findViewById(R.id.listView_display);
         URLDisp = (TextView)findViewById(R.id.textView_URL);
         detailsDisp = (TextView)findViewById(R.id.textView_details);
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             nameList = savedInstanceState.getStringArrayList(NAMELIST);
             urlList = savedInstanceState.getStringArrayList(URLLIST);
             detailList = savedInstanceState.getStringArrayList(DETAILLIST);
+            imagecache = savedInstanceState.getParcelableArrayList(IMAGELIST);
             System.err.println(currentSelection);
             if(currentSelection != -1){
                 URLDisp.setText(urlList.get(currentSelection));
@@ -72,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             nameList.add("Android Developers");urlList.add("developer.android.com/index.html");detailList.add("The official site for Android developers. Provides the Android SDK and documentation for app developers and designers.");
         }
 
-        CustomAdapter myAdapter = new CustomAdapter(this,R.layout.list_layout,nameList,urlList);
+        CustomAdapter myAdapter = new CustomAdapter(this,R.layout.list_layout,nameList,urlList,imagecache);
 
         display.setAdapter(myAdapter);
 
@@ -99,15 +104,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class CustomAdapter extends ArrayAdapter<String> {
-        List list,urlList;
+        List list,urlList,imageList;
         Context mainContext;
 
-        public CustomAdapter(Context context, int resource, List<String> objects, List<String> urls) {
+        public CustomAdapter(Context context, int resource, List<String> objects, List<String> urls, List<Bitmap> images) {
             super(context, resource, objects);
 
             mainContext = context;
             list = objects;
             urlList = urls;
+            //imageList = images;
         }
 
         @Override
@@ -118,7 +124,12 @@ public class MainActivity extends AppCompatActivity {
             ImageView imageView = (ImageView)layoutView.findViewById(R.id.imageView);
 
             textView.setText(list.get(position).toString());
-            new DownloadImageTask(imageView).execute(urlList.get(position).toString());
+            //if(!imageList.isEmpty() && imageList.size()-1 > position){
+            //    imageView.setImageBitmap((Bitmap)imageList.get(position));
+            //}else {
+                new DownloadImageTask(imageView).execute(urlList.get(position).toString());
+                //imagecache.add(position,((BitmapDrawable)imageView.getDrawable()).getBitmap());
+            //}
 
             return layoutView;
         }
@@ -156,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         outBundle.putStringArrayList(NAMELIST,nameList);
         outBundle.putStringArrayList(URLLIST,urlList);
         outBundle.putStringArrayList(DETAILLIST,detailList);
+        outBundle.putParcelableArrayList(IMAGELIST,imagecache);
         super.onSaveInstanceState(outBundle);
     }
 
