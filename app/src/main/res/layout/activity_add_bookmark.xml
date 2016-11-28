@@ -33,20 +33,20 @@
             <EditText
                 android:layout_width="match_parent"
                 android:inputType="textPersonName"
-                android:text="Name"
                 android:ems="10"
                 android:layout_weight=".9"
                 android:id="@+id/editText_name"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:hint="Name: " />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:inputType="textPersonName"
-                android:text="URL:"
                 android:ems="10"
                 android:layout_weight=".9"
-                android:id="@+id/editText_URL" />
+                android:id="@+id/editText_URL"
+                android:hint="URL: " />
 
             <EditText
                 android:layout_width="match_parent"
@@ -55,13 +55,21 @@
                 android:ems="10"
                 android:id="@+id/editText_Desc"
                 android:layout_weight=".9"
-                android:text="Description:"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:hint="Description: " />
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <Button
+                    android:text="ADD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:id="@+id/button_add"
+                    android:layout_weight="1"
+                    android:backgroundTint="@android:color/holo_orange_light" />
 
                 <Button
                     android:layout_width="wrap_content"

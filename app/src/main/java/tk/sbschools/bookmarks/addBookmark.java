@@ -32,7 +32,7 @@ public class addBookmark extends AppCompatActivity {
     ArrayList<String> nameList,urlList,detailList;
     ListView display;
     EditText NameDisp,URLDisp,detailsDisp;
-    Button saveList, delList, doneList;
+    Button addList, saveList, delList, doneList;
     static final String CURRENT_SEL = "cselect";
     static final String NAMELIST = "nList";
     static final String URLLIST = "uList";
@@ -51,6 +51,7 @@ public class addBookmark extends AppCompatActivity {
         NameDisp = (EditText)findViewById(R.id.editText_name);
         URLDisp = (EditText) findViewById(R.id.editText_URL);
         detailsDisp = (EditText) findViewById(R.id.editText_Desc);
+        addList = (Button) findViewById(R.id.button_add);
         saveList = (Button)findViewById(R.id.button_edit);
         delList = (Button)findViewById(R.id.button_del);
         doneList = (Button)findViewById(R.id.button_Done);
@@ -66,6 +67,20 @@ public class addBookmark extends AppCompatActivity {
                 URLDisp.setText(urlList.get(position));
                 detailsDisp.setText(detailList.get(position));
                 currentSelection = position;
+            }
+        });
+
+        addList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nameList.add(currentSelection+1,NameDisp.getText().toString());
+                urlList.add(currentSelection+1,URLDisp.getText().toString());
+                detailList.add(currentSelection+1,detailsDisp.getText().toString());
+                NameDisp.setText("");
+                URLDisp.setText("");
+                detailsDisp.setText("");
+                currentSelection = -1;
+                myAdapter.notifyDataSetChanged();
             }
         });
 
@@ -87,9 +102,9 @@ public class addBookmark extends AppCompatActivity {
                     nameList.remove(currentSelection);
                     urlList.remove(currentSelection);
                     detailList.remove(currentSelection);
-                    NameDisp.setText("Namme: ");
-                    URLDisp.setText("URL: ");
-                    detailsDisp.setText("Details: ");
+                    NameDisp.setText("");
+                    URLDisp.setText("");
+                    detailsDisp.setText("");
                     currentSelection = -1;
                     myAdapter.notifyDataSetChanged();
                 }
@@ -99,6 +114,7 @@ public class addBookmark extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
+                intent.putExtra("USEDATA",true);
                 intent.putExtra(NAMELIST, nameList);
                 intent.putExtra(URLLIST,urlList);
                 intent.putExtra(DETAILLIST,detailList);
@@ -107,6 +123,13 @@ public class addBookmark extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("USEDATA", false);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     public class CustomAdapter extends ArrayAdapter<String> {
